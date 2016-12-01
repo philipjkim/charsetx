@@ -1,3 +1,5 @@
+// Package charsetx provides functions for detecting charset encoding of
+// an HTML document and UTF-8 conversion.
 package charsetx
 
 import (

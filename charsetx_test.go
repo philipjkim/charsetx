@@ -15,8 +15,8 @@ type TestData struct {
 
 func TestGetUTF8BodyForUT8Pages(t *testing.T) {
 	data := []TestData{
-		TestData{URL: "http://www.godoc.org", ExpectedStr: "GoDoc"},
-		TestData{URL: "http://www.kakaocorp.com", ExpectedStr: "카카오"},
+		{URL: "http://www.godoc.org", ExpectedStr: "GoDoc"},
+		{URL: "http://www.kakaocorp.com", ExpectedStr: "카카오"},
 	}
 	for _, d := range data {
 		r, err := GetUTF8Body(d.URL)
@@ -27,9 +27,9 @@ func TestGetUTF8BodyForUT8Pages(t *testing.T) {
 
 func TestGetUTF8BodyForNonUT8KoreanPages(t *testing.T) {
 	data := []TestData{
-		TestData{URL: "http://blog.naver.com/tt820613/220017990859", ExpectedStr: "파라다이스"},
-		TestData{URL: "http://blog.naver.com/yeseul961/220649621993", ExpectedStr: "블로그"},
-		TestData{URL: "http://piggohome.com", ExpectedStr: "집으로돼지"},
+		{URL: "http://blog.naver.com/tt820613/220017990859", ExpectedStr: "파라다이스"},
+		{URL: "http://blog.naver.com/yeseul961/220649621993", ExpectedStr: "블로그"},
+		{URL: "http://piggohome.com", ExpectedStr: "집으로돼지"},
 	}
 	for _, d := range data {
 		r, err := GetUTF8Body(d.URL)
