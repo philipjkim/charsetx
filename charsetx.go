@@ -48,10 +48,6 @@ func GetUTF8Body(urlStr string) (string, error) {
 	defer cd.Close()
 
 	converted := cd.ConvString(string(byt))
-	partLen := 1024
-	if len(converted) <= partLen {
-		partLen = len(converted)
-	}
 
 	// TODO: Verify if broken chars exists.
 

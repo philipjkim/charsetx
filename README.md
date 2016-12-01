@@ -24,59 +24,39 @@ Example
 Getting UTF-8 string of body for given URL:
 
 ```go
-package main
-
-import (
-    "fmt"
-    "github.com/philipjkim/charsetx"
-)
-
-func main() {
-    r, err := charsetx.GetUTF8Body("http://www.godoc.org")
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
-
-    fmt.Println(r)
+r, err := charsetx.GetUTF8Body("http://www.godoc.org")
+if err != nil {
+    fmt.Println(err)
+    return
 }
+
+fmt.Println(r)
 ```
 
 Getting the charset of given URL:
 
 ```go
-package main
-
-import (
-	"io/ioutil"
-	"net/http"
-    "fmt"
-    "github.com/philipjkim/charsetx"
-)
-
-func main() {
-	client := http.DefaultClient
-	resp, err := client.Get(u)
-	if err != nil {
-		fmt.Println(err)
-        return
-	}
-
-	defer resp.Body.Close()
-	byt, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println(err)
-        return
-	}
-
-    cs, err := charsetx.DetectCharset(byt, resp.Header.Get("Content-Type"))
-	if err != nil {
-		fmt.Println(err)
-        return
-	}
-
-    fmt.Println(cs)
+client := http.DefaultClient
+resp, err := client.Get("http://www.godoc.org")
+if err != nil {
+    fmt.Println(err)
+    return
 }
+
+defer resp.Body.Close()
+byt, err := ioutil.ReadAll(resp.Body)
+if err != nil {
+    fmt.Println(err)
+    return
+}
+
+cs, err := charsetx.DetectCharset(byt, resp.Header.Get("Content-Type"))
+if err != nil {
+    fmt.Println(err)
+    return
+}
+
+fmt.Println(cs)
 ```
 
 Related Projects
