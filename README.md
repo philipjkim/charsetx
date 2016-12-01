@@ -13,20 +13,17 @@ There are 3 steps for charset detection:
 
 If all 3 steps fails, it returns error.
 
-Install
--------
+## Install
 
     go get -u github.com/philipjkim/charsetx
 
 
-Example
--------
+## Example
 
-Getting UTF-8 string of body for given URL:
+### Getting UTF-8 string of body for given URL
 
 ```go
-client := http.DefaultClient
-r, err := charsetx.GetUTF8Body("http://www.godoc.org", client)
+r, err := charsetx.GetUTF8BodyFromURL("http://www.godoc.org")
 if err != nil {
     fmt.Println(err)
     return
@@ -35,7 +32,11 @@ if err != nil {
 fmt.Println(r)
 ```
 
-Getting the charset of given URL:
+If you want to reuse or customize `*http.Client` instead of `http.DefaultClient`, 
+use [GetUTF8()](https://godoc.org/github.com/philipjkim/charsetx#GetUTF8Body).
+
+
+### Getting the charset of given URL
 
 ```go
 client := http.DefaultClient
@@ -61,15 +62,14 @@ if err != nil {
 fmt.Println(cs)
 ```
 
-Related Projects
-----------------
+
+## Related Projects
 
 * [golang.org/x/net/html/charset](https://godoc.org/golang.org/x/net/html/charset)
 * [github.com/saintfish/chardet](https://godoc.org/github.com/saintfish/chardet)
-* [github.com/qiniu/iconv](https://godoc.org/github.com/qiniu/iconv)
+* [github.com/djimenez/iconv-go](https://godoc.org/github.com/djimenez/iconv-go)
 
 
-License
--------
+## License
 
 [MIT](LICENSE)
