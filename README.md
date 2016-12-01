@@ -33,7 +33,7 @@ fmt.Println(r)
 ```
 
 If you want to reuse or customize `*http.Client` instead of `http.DefaultClient`, 
-use [GetUTF8()](https://godoc.org/github.com/philipjkim/charsetx#GetUTF8Body).
+use [GetUTF8Body()](https://godoc.org/github.com/philipjkim/charsetx#GetUTF8Body).
 
 
 ### Getting the charset of given URL
