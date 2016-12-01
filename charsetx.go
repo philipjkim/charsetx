@@ -1,4 +1,4 @@
-package csdetect
+package charsetx
 
 import (
 	"fmt"
