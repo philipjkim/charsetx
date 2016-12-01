@@ -25,7 +25,8 @@ Example
 Getting UTF-8 string of body for given URL:
 
 ```go
-r, err := charsetx.GetUTF8Body("http://www.godoc.org")
+client := http.DefaultClient
+r, err := charsetx.GetUTF8Body("http://www.godoc.org", client)
 if err != nil {
     fmt.Println(err)
     return
