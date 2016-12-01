@@ -9,7 +9,18 @@ import (
 )
 
 func ExampleGetUTF8Body() {
-	r, err := charsetx.GetUTF8Body("http://www.godoc.org")
+	client := http.DefaultClient
+	r, err := charsetx.GetUTF8Body("http://www.godoc.org", client)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(r)
+}
+
+func ExampleGetUTF8BodyWithDefaultClient() {
+	r, err := charsetx.GetUTF8BodyWithDefaultClient("http://www.godoc.org")
 	if err != nil {
 		fmt.Println(err)
 		return

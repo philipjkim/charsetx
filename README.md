@@ -10,7 +10,8 @@ There are 3 steps for charset detection:
 1. Return the result of [charset.DetermineEncoding()](https://godoc.org/golang.org/x/net/html/charset#DetermineEncoding) if `certain` is true.
 2. Return the result of [chardet.Detector.DetectBest()](https://godoc.org/github.com/saintfish/chardet#Detector.DetectBest) if `Confidence` is 100.
 3. Return charset in `Content-Type` meta tag if exists.
-4. Else, return error.
+
+If all 3 steps fails, it returns error.
 
 Install
 -------

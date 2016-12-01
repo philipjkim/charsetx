@@ -3,6 +3,7 @@
 package charsetx
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -14,7 +15,7 @@ import (
 	"mime"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/qiniu/iconv"
+	iconv "github.com/djimenez/iconv-go"
 	"github.com/saintfish/chardet"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/charset"
@@ -22,8 +23,11 @@ import (
 
 // GetUTF8Body returns response body of urlStr as string.
 // It converts charset to UTF-8 if original charset is non UTF-8.
-func GetUTF8Body(urlStr string) (string, error) {
-	client := http.DefaultClient
+func GetUTF8Body(urlStr string, client *http.Client) (string, error) {
+	if client == nil {
+		return "", errors.New("http.Client is nil")
+	}
+
 	resp, err := client.Get(urlStr)
 	if err != nil {
 		return "", err
@@ -43,17 +47,20 @@ func GetUTF8Body(urlStr string) (string, error) {
 	}
 
 	// Convert body.
-	cd, err := iconv.Open("utf-8", cs)
-	if err != nil {
+	converted, err := iconv.ConvertString(string(byt), cs, "utf-8")
+	if err != nil && !strings.Contains(converted, "</head>") {
 		return "", err
 	}
-	defer cd.Close()
-
-	converted := cd.ConvString(string(byt))
 
 	// TODO: Verify if broken chars exists.
 
 	return converted, nil
+}
+
+// GetUTF8BodyWithDefaultClient acts same as GetUTF8Body().
+// The only difference is this uses http.DefaultClient as http client.
+func GetUTF8BodyWithDefaultClient(urlStr string) (string, error) {
+	return GetUTF8Body(urlStr, http.DefaultClient)
 }
 
 /*
