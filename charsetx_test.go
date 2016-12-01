@@ -17,20 +17,21 @@ type TestData struct {
 }
 
 func TestGetUTF8BodyForUT8Pages(t *testing.T) {
-	client := http.DefaultClient
 	data := []TestData{
 		{URL: "http://www.godoc.org", ExpectedStr: "GoDoc"},
 		{URL: "http://www.kakaocorp.com", ExpectedStr: "카카오"},
 	}
 	for _, d := range data {
-		r, err := GetUTF8Body(d.URL, client)
+		b, c, err := getBodyAndContentType(d.URL)
+		assert.Nil(t, err)
+
+		r, err := GetUTF8Body(b, c)
 		assert.Nil(t, err)
 		assert.Contains(t, r, d.ExpectedStr)
 	}
 }
 
 func TestGetUTF8BodyForNonUT8KoreanPages(t *testing.T) {
-	client := getCustomHTTPClient()
 	data := []TestData{
 		{URL: "http://blog.naver.com/tt820613/220017990859", ExpectedStr: "파라다이스"},
 		{URL: "http://blog.naver.com/yeseul961/220649621993", ExpectedStr: "블로그"},
@@ -43,19 +44,22 @@ func TestGetUTF8BodyForNonUT8KoreanPages(t *testing.T) {
 		//{URL: "", ExpectedStr: ""},
 	}
 	for _, d := range data {
-		r, err := GetUTF8Body(d.URL, client)
+		b, c, err := getBodyAndContentType(d.URL)
+		assert.Nil(t, err)
+
+		r, err := GetUTF8Body(b, c)
 		assert.Nil(t, err)
 		assert.Contains(t, r, d.ExpectedStr)
 	}
 }
 
-func TestGetUTF8BodyWithDefaultClientForUT8Pages(t *testing.T) {
+func TestGetUTF8BodyFromURLForUT8Pages(t *testing.T) {
 	data := []TestData{
 		{URL: "http://www.godoc.org", ExpectedStr: "GoDoc"},
 		{URL: "http://www.kakaocorp.com", ExpectedStr: "카카오"},
 	}
 	for _, d := range data {
-		r, err := GetUTF8BodyWithDefaultClient(d.URL)
+		r, err := GetUTF8BodyFromURL(d.URL)
 		assert.Nil(t, err)
 		assert.Contains(t, r, d.ExpectedStr)
 	}
@@ -90,7 +94,7 @@ func TestDetectCharsetForNonUTF8KoreanPages(t *testing.T) {
 }
 
 func getBodyAndContentType(u string) ([]byte, string, error) {
-	client := http.DefaultClient
+	client := getCustomHTTPClient()
 	resp, err := client.Get(u)
 	if err != nil {
 		return nil, "", err

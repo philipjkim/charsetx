@@ -3,7 +3,6 @@
 package charsetx
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -21,13 +20,31 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-// GetUTF8Body returns response body of urlStr as string.
-// It converts charset to UTF-8 if original charset is non UTF-8.
-func GetUTF8Body(urlStr string, client *http.Client) (string, error) {
-	if client == nil {
-		return "", errors.New("http.Client is nil")
+// GetUTF8Body returns string of body.
+// If charset for body is detected as non-UTF8,
+// this function converts to UTF-8 string and return it.
+func GetUTF8Body(body []byte, contentType string) (string, error) {
+	// Detect charset.
+	cs, err := DetectCharset(body, contentType)
+	if err != nil {
+		return "", err
 	}
 
+	// Convert body.
+	converted, err := iconv.ConvertString(string(body), cs, "utf-8")
+	if err != nil && !strings.Contains(converted, "</head>") {
+		return "", err
+	}
+
+	// TODO: Verify if broken chars exists.
+
+	return converted, nil
+}
+
+// GetUTF8BodyFromURL returns response body of urlStr as string.
+// It converts charset to UTF-8 if original charset is non UTF-8.
+func GetUTF8BodyFromURL(urlStr string) (string, error) {
+	client := http.DefaultClient
 	resp, err := client.Get(urlStr)
 	if err != nil {
 		return "", err
@@ -40,27 +57,7 @@ func GetUTF8Body(urlStr string, client *http.Client) (string, error) {
 	}
 
 	// Detect charset.
-	ct := resp.Header.Get("Content-Type")
-	cs, err := DetectCharset(byt, ct)
-	if err != nil {
-		return "", err
-	}
-
-	// Convert body.
-	converted, err := iconv.ConvertString(string(byt), cs, "utf-8")
-	if err != nil && !strings.Contains(converted, "</head>") {
-		return "", err
-	}
-
-	// TODO: Verify if broken chars exists.
-
-	return converted, nil
-}
-
-// GetUTF8BodyWithDefaultClient acts same as GetUTF8Body().
-// The only difference is this uses http.DefaultClient as http client.
-func GetUTF8BodyWithDefaultClient(urlStr string) (string, error) {
-	return GetUTF8Body(urlStr, http.DefaultClient)
+	return GetUTF8Body(byt, resp.Header.Get("Content-Type"))
 }
 
 /*

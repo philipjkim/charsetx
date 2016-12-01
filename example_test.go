@@ -10,7 +10,20 @@ import (
 
 func ExampleGetUTF8Body() {
 	client := http.DefaultClient
-	r, err := charsetx.GetUTF8Body("http://www.godoc.org", client)
+	resp, err := client.Get("https://golang.org/")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	r, err := charsetx.GetUTF8Body(body, resp.Header.Get("Content-Type"))
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -19,8 +32,8 @@ func ExampleGetUTF8Body() {
 	fmt.Println(r)
 }
 
-func ExampleGetUTF8BodyWithDefaultClient() {
-	r, err := charsetx.GetUTF8BodyWithDefaultClient("http://www.godoc.org")
+func ExampleGetUTF8BodyFromURL() {
+	r, err := charsetx.GetUTF8BodyFromURL("http://www.godoc.org")
 	if err != nil {
 		fmt.Println(err)
 		return
