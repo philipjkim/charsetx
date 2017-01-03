@@ -66,7 +66,11 @@ func TestGetUTF8BodyFromURLForUT8Pages(t *testing.T) {
 }
 
 func TestDetectCharsetForUTF8Pages(t *testing.T) {
-	urls := []string{"http://www.godoc.org", "http://www.kakaocorp.com"}
+	urls := []string{
+		"http://www.godoc.org",
+		"http://www.kakaocorp.com",
+		"http://www.sciencedirect.com/science/article/pii/S2092521216300827",
+	}
 	for _, u := range urls {
 		b, c, err := getBodyAndContentType(u)
 		assert.Nil(t, err)
@@ -95,7 +99,9 @@ func TestDetectCharsetForNonUTF8KoreanPages(t *testing.T) {
 
 func getBodyAndContentType(u string) ([]byte, string, error) {
 	client := getCustomHTTPClient()
-	resp, err := client.Get(u)
+	req, err := http.NewRequest("GET", u, nil)
+	req.Header.Set("User-Agent", "")
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, "", err
 	}
@@ -106,7 +112,6 @@ func getBodyAndContentType(u string) ([]byte, string, error) {
 		return nil, "", err
 	}
 
-	// detect charset
 	return byt, resp.Header.Get("Content-Type"), nil
 }
 

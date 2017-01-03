@@ -97,8 +97,8 @@ func DetectCharset(body []byte, contentType string) (string, error) {
 	doc := goquery.NewDocumentFromNode(root)
 	var csFromMeta string
 	doc.Find("meta").EachWithBreak(func(i int, s *goquery.Selection) bool {
-		c, exists := s.Attr("content")
-		if exists && strings.Contains(c, "charset") {
+		// <meta http-equiv="Content-Type" content="text/html; charset=MS949"/>
+		if c, exists := s.Attr("content"); exists && strings.Contains(c, "charset") {
 			if _, params, err := mime.ParseMediaType(c); err == nil {
 				if cs, ok := params["charset"]; ok {
 					csFromMeta = strings.ToLower(cs)
@@ -109,8 +109,15 @@ func DetectCharset(body []byte, contentType string) (string, error) {
 					return false
 				}
 			}
-			fmt.Println(c)
+			return true
 		}
+
+		// <meta charset="utf-8"/>
+		if c, exists := s.Attr("charset"); exists {
+			csFromMeta = c
+			return false
+		}
+
 		return true
 	})
 
