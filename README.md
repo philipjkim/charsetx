@@ -23,7 +23,10 @@ If all 3 steps fails, it returns error.
 ### Getting UTF-8 string of body for given URL
 
 ```go
-r, err := charsetx.GetUTF8BodyFromURL("http://www.godoc.org")
+// Invalid UTF-8 characters are discarded to give a result 
+// rather than giving error 
+// if the second bool param is set to true.
+r, err := charsetx.GetUTF8BodyFromURL("http://www.godoc.org", false)
 if err != nil {
     fmt.Println(err)
     return

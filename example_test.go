@@ -23,7 +23,7 @@ func ExampleGetUTF8Body() {
 		return
 	}
 
-	r, err := charsetx.GetUTF8Body(body, resp.Header.Get("Content-Type"))
+	r, err := charsetx.GetUTF8Body(body, resp.Header.Get("Content-Type"), false)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -33,7 +33,7 @@ func ExampleGetUTF8Body() {
 }
 
 func ExampleGetUTF8BodyFromURL() {
-	r, err := charsetx.GetUTF8BodyFromURL("http://www.godoc.org")
+	r, err := charsetx.GetUTF8BodyFromURL("http://www.godoc.org", false)
 	if err != nil {
 		fmt.Println(err)
 		return

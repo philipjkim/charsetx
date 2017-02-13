@@ -3,15 +3,13 @@
 package charsetx
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net/http"
-
-	"strings"
-
-	"bytes"
-
 	"mime"
+	"net/http"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/PuerkitoBio/goquery"
 	iconv "github.com/djimenez/iconv-go"
@@ -23,27 +21,47 @@ import (
 // GetUTF8Body returns string of body.
 // If charset for body is detected as non-UTF8,
 // this function converts to UTF-8 string and return it.
-func GetUTF8Body(body []byte, contentType string) (string, error) {
+// Illegal byte sequences are silently discarded
+// if ignoreInvalidUTF8Chars is set to true.
+func GetUTF8Body(body []byte, contentType string,
+	ignoreInvalidUTF8Chars bool) (string, error) {
 	// Detect charset.
 	cs, err := DetectCharset(body, contentType)
 	if err != nil {
 		return "", err
 	}
 
+	// Remove utf8.RuneError if ignoreInvalidUTF8Chars is true.
+	bs := string(body)
+	if ignoreInvalidUTF8Chars {
+		if !utf8.ValidString(bs) {
+			v := make([]rune, 0, len(bs))
+			for i, r := range bs {
+				if r == utf8.RuneError {
+					_, size := utf8.DecodeRuneInString(bs[i:])
+					if size == 1 {
+						continue
+					}
+				}
+				v = append(v, r)
+			}
+			bs = string(v)
+		}
+	}
+
 	// Convert body.
-	converted, err := iconv.ConvertString(string(body), cs, "utf-8")
+	converted, err := iconv.ConvertString(bs, cs, "utf-8")
 	if err != nil && !strings.Contains(converted, "</head>") {
 		return "", err
 	}
-
-	// TODO: Verify if broken chars exists.
 
 	return converted, nil
 }
 
 // GetUTF8BodyFromURL returns response body of urlStr as string.
 // It converts charset to UTF-8 if original charset is non UTF-8.
-func GetUTF8BodyFromURL(urlStr string) (string, error) {
+// Illegal byte sequences are silently discarded if ignoreIBS is set to true.
+func GetUTF8BodyFromURL(urlStr string, ignoreIBS bool) (string, error) {
 	client := http.DefaultClient
 	resp, err := client.Get(urlStr)
 	if err != nil {
@@ -57,7 +75,7 @@ func GetUTF8BodyFromURL(urlStr string) (string, error) {
 	}
 
 	// Detect charset.
-	return GetUTF8Body(byt, resp.Header.Get("Content-Type"))
+	return GetUTF8Body(byt, resp.Header.Get("Content-Type"), ignoreIBS)
 }
 
 /*
@@ -122,7 +140,7 @@ func DetectCharset(body []byte, contentType string) (string, error) {
 	})
 
 	if csFromMeta == "" {
-		return "", fmt.Errorf("Failed to detect charset")
+		return "", fmt.Errorf("failed to detect charset")
 	}
 
 	return csFromMeta, nil

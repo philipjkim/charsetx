@@ -25,7 +25,24 @@ func TestGetUTF8BodyForUT8Pages(t *testing.T) {
 		b, c, err := getBodyAndContentType(d.URL)
 		assert.Nil(t, err)
 
-		r, err := GetUTF8Body(b, c)
+		r, err := GetUTF8Body(b, c, false)
+		assert.Nil(t, err)
+		assert.Contains(t, r, d.ExpectedStr)
+	}
+}
+
+func TestGetUTF8BodyForUT8PagesWithRuneErrors(t *testing.T) {
+	data := []TestData{
+		{URL: "http://www.huffingtonpost.kr/2017/02/07/story_n_14633334.html", ExpectedStr: "저녁이"},
+	}
+	for _, d := range data {
+		b, c, err := getBodyAndContentType(d.URL)
+		assert.Nil(t, err)
+
+		r, err := GetUTF8Body(b, c, false)
+		assert.NotNil(t, err)
+
+		r, err = GetUTF8Body(b, c, true)
 		assert.Nil(t, err)
 		assert.Contains(t, r, d.ExpectedStr)
 	}
@@ -47,7 +64,7 @@ func TestGetUTF8BodyForNonUT8KoreanPages(t *testing.T) {
 		b, c, err := getBodyAndContentType(d.URL)
 		assert.Nil(t, err)
 
-		r, err := GetUTF8Body(b, c)
+		r, err := GetUTF8Body(b, c, false)
 		assert.Nil(t, err)
 		assert.Contains(t, r, d.ExpectedStr)
 	}
@@ -59,7 +76,7 @@ func TestGetUTF8BodyFromURLForUT8Pages(t *testing.T) {
 		{URL: "http://www.kakaocorp.com", ExpectedStr: "카카오"},
 	}
 	for _, d := range data {
-		r, err := GetUTF8BodyFromURL(d.URL)
+		r, err := GetUTF8BodyFromURL(d.URL, false)
 		assert.Nil(t, err)
 		assert.Contains(t, r, d.ExpectedStr)
 	}
@@ -69,7 +86,6 @@ func TestDetectCharsetForUTF8Pages(t *testing.T) {
 	urls := []string{
 		"http://www.godoc.org",
 		"http://www.kakaocorp.com",
-		"http://www.sciencedirect.com/science/article/pii/S2092521216300827",
 	}
 	for _, u := range urls {
 		b, c, err := getBodyAndContentType(u)
