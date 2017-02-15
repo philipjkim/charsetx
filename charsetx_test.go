@@ -20,12 +20,13 @@ func TestGetUTF8BodyForUT8Pages(t *testing.T) {
 	data := []TestData{
 		{URL: "http://www.godoc.org", ExpectedStr: "GoDoc"},
 		{URL: "http://www.kakaocorp.com", ExpectedStr: "카카오"},
+		{URL: "http://www.coremsys.com/", ExpectedStr: "COREMSYS"},
 	}
 	for _, d := range data {
 		b, c, err := getBodyAndContentType(d.URL)
 		assert.Nil(t, err)
 
-		r, err := GetUTF8Body(b, c, false)
+		r, err := GetUTF8Body(b, c, true)
 		assert.Nil(t, err)
 		assert.Contains(t, r, d.ExpectedStr)
 	}

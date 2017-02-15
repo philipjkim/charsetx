@@ -28,7 +28,10 @@ func GetUTF8Body(body []byte, contentType string,
 	// Detect charset.
 	cs, err := DetectCharset(body, contentType)
 	if err != nil {
-		return "", err
+		if !ignoreInvalidUTF8Chars {
+			return "", err
+		}
+		cs = "utf-8"
 	}
 
 	// Remove utf8.RuneError if ignoreInvalidUTF8Chars is true.
